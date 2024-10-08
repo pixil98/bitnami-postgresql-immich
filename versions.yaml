@@ -1,8 +1,8 @@
 bitnami-postgresql:
   # renovate: datasource=docker depName=bitnami/postgresql
-  - "15.8.0"
+  - "17.0.0"
   # renovate: datasource=docker depName=bitnami/postgresql
-  - "16.4.0"
+  - "17.0.0"
   # renovate: datasource=docker depName=bitnami/postgresql
   - "17.0.0"
 pgvectors:
