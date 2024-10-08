@@ -1,0 +1,28 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+      "config:base"
+    ],
+    "automerge": true,
+    "rebaseWhen": "conflicted",
+    "customManagers": [
+      {
+        "customType": "regex",
+        "fileMatch": ["^versions.yaml$"],
+        "matchStrings": [
+          "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n.*?\"(?<currentValue>.*)\"\\n"
+        ]
+      }
+    ],
+    "packageRules": [
+      {
+        "matchUpdateTypes": ["major"],
+        "matchPackageNames": ["bitnami/postgresql"],
+        "enabled": false
+      },
+      {
+        "matchPackageNames": ["bitnami/postgresql"],
+        "groupName": "postgresql"
+      }
+    ]
+  }
