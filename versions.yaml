@@ -7,6 +7,6 @@ bitnami-postgresql:
   - "17.0.0"
 pgvectors:
   # renovate: datasource=github-releases depName=tensorchord/pgvecto.rs
-  - "v0.2.1"
+  - "v0.3.0"
   # renovate: datasource=github-releases depName=tensorchord/pgvecto.rs
   - "v0.3.0"
