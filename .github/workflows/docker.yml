@@ -83,7 +83,9 @@ jobs:
         id: version
         run: |
           pg_major=$(echo ${{ matrix.bitnami-postgresql }} | cut -d'.' -f1)
+          pg_patch=$(echo ${{ matrix.bitnami-postgresql }} | cut -d'-' -f1)
           echo "pg_major=$pg_major" >> "$GITHUB_OUTPUT"
+          echo "pg_patch=$pg_patch" >> "$GITHUB_OUTPUT"
 
       - name: Generate docker image tags
         id: metadata
@@ -96,9 +98,8 @@ jobs:
             name=ghcr.io/${{ github.repository }}
             name=pixil/bitnami-postgresql-immich
           tags: |
-            type=raw,value=${{ matrix.bitnami-postgresql }}-${{ matrix.pgvectors }},enable=${{ steps.should-release.outputs.result }}
-            type=raw,value=${{ steps.version.outputs.pg_major }}-${{ matrix.pgvectors }},enable=${{ steps.should-release.outputs.result }}
             type=raw,value=${{ matrix.bitnami-postgresql }},enable=${{ steps.should-release.outputs.result }}
+            type=raw,value=${{ steps.version.outputs.pg_patch }},enable=${{ steps.should-release.outputs.result }}
             type=raw,value=${{ steps.version.outputs.pg_major }},enable=${{ steps.should-release.outputs.result }}
 
       - name: Build and push image
