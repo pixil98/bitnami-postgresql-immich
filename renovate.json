@@ -28,6 +28,11 @@
         "matchUpdateTypes": ["major", "minor"],
         "matchPackageNames": ["tensorchord/pgvecto.rs"],
         "enabled": false
+      },
+      {
+        "matchUpdateTypes": ["major", "minor"],
+        "matchPackageNames": ["tensorchord/VectorChord"],
+        "enabled": false
       }
     ]
   }

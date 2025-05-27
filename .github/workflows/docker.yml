@@ -115,6 +115,7 @@ jobs:
           build-args: |
             BITNAMI_TAG=${{ matrix.bitnami-postgresql }}
             PGVECTORS_TAG=${{ matrix.pgvectors }}
+            VCHORD_TAG=${{ matrix.vchord }}
 
   results:
       if: ${{ always() }}
