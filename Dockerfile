@@ -1,22 +1,30 @@
-ARG PGVECTORS_TAG
 ARG BITNAMI_TAG
-FROM tensorchord/pgvecto-rs-binary:pg${BITNAMI_TAG%%.*}-${PGVECTORS_TAG}-${TARGETARCH} AS pgvectors
+
 FROM debian:bullseye-slim AS builder
-
-COPY --from=pgvectors /pgvecto-rs-binary-release.deb /
-RUN dpkg -x /pgvecto-rs-binary-release.deb /tmp/pgvectors
-
+ARG PGVECTORS_TAG
+ARG VECTORCHORD_TAG
 ARG BITNAMI_TAG
-FROM bitnami/postgresql:${BITNAMI_TAG}
+ARG TARGETARCH
 
+RUN apt-get update && \
+    apt-get install -y wget
+RUN wget -nv -O /tmp/vchord.deb https://github.com/tensorchord/VectorChord/releases/download/${VECTORCHORD_TAG}/postgresql-${BITNAMI_TAG%%.*}-vchord_${VECTORCHORD_TAG#"v"}-1_${TARGETARCH}.deb && \
+    dpkg -x /tmp/vchord.deb /tmp && \
+    if [ -n "${PGVECTORS_TAG}" ]; then \
+        wget -nv -O /tmp/pgvectors.deb https://github.com/tensorchord/pgvecto.rs/releases/download/v${PGVECTORS_TAG}/vectors-pg${BITNAMI_TAG%%.*}_${PGVECTORS_TAG#"v"}_${TARGETARCH}$(if [ "${PGVECTORS_TAG}" = '0.3.0' ]; then echo "_vectors"; fi).deb; \
+        dpkg -x /tmp/pgvectors.deb /tmp; \
+        rm -f /tmp/pgvectors.deb; \
+    fi
+
+FROM bitnami/postgresql:${BITNAMI_TAG}
 ARG BITNAMI_TAG
 
 # drop to root to install packages
 USER root
 
-COPY --from=builder /tmp/pgvectors/usr/lib/postgresql/${BITNAMI_TAG%%.*}/lib/* /opt/bitnami/postgresql/lib/
-COPY --from=builder /tmp/pgvectors/usr/share/postgresql/${BITNAMI_TAG%%.*}/extension/* /opt/bitnami/postgresql/share/extension/
+COPY --from=builder /tmp/usr/lib/postgresql/${BITNAMI_TAG%%.*}/lib/* /opt/bitnami/postgresql/lib/
+COPY --from=builder /tmp/usr/share/postgresql/${BITNAMI_TAG%%.*}/extension/* /opt/bitnami/postgresql/share/extension/
 
 USER 1001
 
-ENV POSTGRESQL_EXTRA_FLAGS="-c shared_preload_libraries=vectors.so"
+ENV POSTGRESQL_EXTRA_FLAGS="-c shared_preload_libraries=vectors.so,vchord.so"
