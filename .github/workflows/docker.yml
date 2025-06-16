@@ -116,6 +116,7 @@ jobs:
             BITNAMI_TAG=${{ matrix.bitnami-postgresql }}
             PGVECTORS_TAG=${{ matrix.pgvectors }}
             VECTORCHORD_TAG=${{ matrix.vectorchord }}
+            PGVECTOR_TAG=${{ matrix.pgvector }}
 
   results:
       if: ${{ always() }}
