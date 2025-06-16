@@ -96,7 +96,7 @@ jobs:
             latest=false
           images: |
             name=ghcr.io/${{ github.repository }}
-            name=pixil/bitnami-immich
+            name=pixil/bitnami-postgresql-immich
           tags: |
             type=raw,value=${{ matrix.bitnami-postgresql }},enable=${{ steps.should-release.outputs.result }}
             type=raw,value=${{ steps.version.outputs.pg_patch }},enable=${{ steps.should-release.outputs.result }}
