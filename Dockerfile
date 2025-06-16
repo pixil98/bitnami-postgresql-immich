@@ -1,33 +1,29 @@
-ARG PGVECTORS_TAG
-ARG VCHORD_TAG
 ARG BITNAMI_TAG
-FROM tensorchord/pgvecto-rs-binary:pg${BITNAMI_TAG%%.*}-${PGVECTORS_TAG}-${TARGETARCH} AS pgvectors
-
-ARG VCHORD_TAG
-ARG BITNAMI_TAG
-FROM tensorchord/vchord-binary:pg${BITNAMI_TAG%%.*}-v${VCHORD_TAG}-${TARGETARCH} AS vchord
-COPY /workspace/postgresql-${BITNAMI_TAG%%.*}-vchord_${VCHORD_TAG}-1_${TARGETARCH}.deb /workspace/vchord.deb
 
 FROM debian:bullseye-slim AS builder
-
-COPY --from=pgvectors /pgvecto-rs-binary-release.deb /
-RUN dpkg -x /pgvecto-rs-binary-release.deb /tmp/pgvectors
-
-COPY --from=vchord /workspace/vchord.deb /
-RUN dpkg -x /vchord.deb /tmp/vchord
-
+ARG PGVECTORS_TAG
+ARG VECTORCHORD_TAG
 ARG BITNAMI_TAG
-FROM bitnami/postgresql:${BITNAMI_TAG}
+ARG TARGETARCH
 
+RUN apt-get update && \
+    apt-get install -y wget
+RUN wget -nv -O /tmp/vchord.deb https://github.com/tensorchord/VectorChord/releases/download/${VECTORCHORD_TAG}/postgresql-${BITNAMI_TAG%%.*}-vchord_${VECTORCHORD_TAG#"v"}-1_${TARGETARCH}.deb && \
+    dpkg -x /tmp/vchord.deb /tmp && \
+    if [ -n "${PGVECTORS_TAG}" ]; then \
+        wget -nv -O /tmp/pgvectors.deb https://github.com/tensorchord/pgvecto.rs/releases/download/v${PGVECTORS_TAG}/vectors-pg${BITNAMI_TAG%%.*}_${PGVECTORS_TAG#"v"}_${TARGETARCH}$(if [ "${PGVECTORS_TAG}" = '0.3.0' ]; then echo "_vectors"; fi).deb; \
+        dpkg -x /tmp/pgvectors.deb /tmp; \
+        rm -f /tmp/pgvectors.deb; \
+    fi
+
+FROM bitnami/postgresql:${BITNAMI_TAG}
 ARG BITNAMI_TAG
 
 # drop to root to install packages
 USER root
 
-COPY --from=builder /tmp/pgvectors/usr/lib/postgresql/${BITNAMI_TAG%%.*}/lib/* /opt/bitnami/postgresql/lib/
-COPY --from=builder /tmp/pgvectors/usr/share/postgresql/${BITNAMI_TAG%%.*}/extension/* /opt/bitnami/postgresql/share/extension/
-COPY --from=builder /tmp/vchord/usr/lib/postgresql/${BITNAMI_TAG%%.*}/lib/* /opt/bitnami/postgresql/lib/
-COPY --from=builder /tmp/vchord/usr/share/postgresql/${BITNAMI_TAG%%.*}/extension/* /opt/bitnami/postgresql/share/extension/
+COPY --from=builder /tmp/usr/lib/postgresql/${BITNAMI_TAG%%.*}/lib/* /opt/bitnami/postgresql/lib/
+COPY --from=builder /tmp/usr/share/postgresql/${BITNAMI_TAG%%.*}/extension/* /opt/bitnami/postgresql/share/extension/
 
 USER 1001
 

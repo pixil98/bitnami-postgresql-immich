@@ -8,6 +8,6 @@ bitnami-postgresql:
 pgvectors:
   # renovate: datasource=github-releases depName=tensorchord/pgvecto.rs
   - "v0.3.0"
-vchord:
+vectorchord:
   # renovate: datasource=github-releases depName=tensorchord/VectorChord
   - "0.3.0"
